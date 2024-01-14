@@ -1,21 +1,30 @@
-// This is an example on how to set up and use Sokol GP to draw a filled rectangle.
-
-// Includes Sokol GFX, Sokol GP and Sokol APP, doing all implementations.
 #define SOKOL_IMPL
 #include "sokol_gfx.h"
 #include "sokol_gp.h"
-#include "sokol_app.h"
 #include "sokol_glue.h"
 #include "sokol_log.h"
+#include <GLFW/glfw3.h>
 
-#include <stdio.h> // for fprintf()
-#include <stdlib.h> // for exit()
-#include <math.h> // for sinf() and cosf()
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+ 
+static void error_callback(int error, const char* description)
+{
+    fprintf(stderr, "Error: %s\n", description);
+}
+ 
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+}
 
 // Called on every frame of the application.
 static void frame(void) {
-    // Get current window size.
-    int width = sapp_width(), height = sapp_height();
+    int width, height
+    glfwGetFramebufferSize(window, &width, &height);
     float ratio = width/(float)height;
 
     // Begin recording draw commands for a frame buffer of size (width, height).
@@ -43,13 +52,10 @@ static void frame(void) {
     sgp_flush();
     // Finish a draw command queue, clearing it.
     sgp_end();
-    // End render pass.
     sg_end_pass();
-    // Commit Sokol render.
     sg_commit();
 }
 
-// Called when the application is initializing.
 static void init(void) {
     // Initialize Sokol GFX.
     sg_desc sgdesc = {
@@ -76,17 +82,39 @@ static void cleanup(void) {
     // Cleanup Sokol GP and Sokol GFX resources.
     sgp_shutdown();
     sg_shutdown();
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
 }
 
-// Implement application main through Sokol APP.
-sapp_desc sokol_main(int argc, char* argv[]) {
-    (void)argc;
-    (void)argv;
-    return (sapp_desc){
-        .init_cb = init,
-        .frame_cb = frame,
-        .cleanup_cb = cleanup,
-        .window_title = "Rectangle (Sokol GP)",
-        .logger.func = slog_func,
-    };
+int main(void)
+{
+    GLFWwindow* window;
+ 
+    glfwSetErrorCallback(error_callback);
+ 
+    if (!glfwInit())
+        exit(EXIT_FAILURE);
+ 
+    window = glfwCreateWindow(640, 480, "Simple example", NULL, NULL);
+    
+    if (!window)
+    {
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    }
+ 
+    glfwSetKeyCallback(window, key_callback);
+ 
+    glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);
+ 
+    while (!glfwWindowShouldClose(window))
+    {
+        glfwPollEvents();
+    }
+ 
+    cleanup()
+
+    exit(EXIT_SUCCESS);
 }

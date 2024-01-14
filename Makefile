@@ -1,6 +1,5 @@
 CC = gcc
-CFLAGS = -std=c99
-CFLAGS += -Wall -Wextra -Wshadow -Wno-unused-function -Ilib -fsanitize=address
+CFLAGS = -Wall -Wextra -Wshadow -Wno-unused-function -Ilib -fsanitize=address -lm -lGL -lglfw -DGLFW_BUILD_WAYLAND=ON -DGLFW_BUILD_X11=OFF
 SRC = main.c
 TARGET = editor
 
